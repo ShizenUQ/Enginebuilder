@@ -1,0 +1,17 @@
+      - name: Build debug APK
+        working-directory: ${{ env.PROJECT_ROOT }}
+        run: |
+          gradle wrapper --gradle-version 8.10
+          set +e
+          ./gradlew assembleDebug --stacktrace > build.log 2>&1
+          STATUS=$?
+          echo "=== COMPILE ERRORS ==="
+          grep -E "^e: |What went wrong|error:|Execution failed|Unresolved|Could not" -A3 build.log | head -150
+          exit $STATUS
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: ${{ env.PROJECT_ROOT }}/build.log
